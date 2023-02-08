@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from .models import Post, PostLike, Comment, CommentLike
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import PostSerializer, CommentSerializer, PostLikeSerializer
 from rest_framework.exceptions import ValidationError
 
 
@@ -68,5 +68,22 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
             return super().delete(request, *args, **kwargs)
         else:
             raise ValidationError("Negalima redaguoti svetimu komentaru!")
+
+
+class PostLikeCreate(generics.CreateAPIView):
+    serializer_class = PostLikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        post = Post.objects.get(pk=self.kwargs['pk'])
+        return PostLike.objects.filter(post=post, user=user)
+
+    def perform_create(self, serializer):
+        if self.get_queryset().exists():
+            raise ValidationError("Jus jau palaikinot sita posta")
+        else:
+            post = Post.objects.get(pk=self.kwargs['pk'])
+            serializer.save(user=self.request.user, post=post)
 
 
