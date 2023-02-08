@@ -14,10 +14,13 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(to="Post", on_delete=models.CASCADE)
+    post = models.ForeignKey(to="Post", on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     body = models.CharField(max_length=2000)
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.post.id}: {self.body} ({self.user})"
 
     class Meta:
         ordering = ["-created"]
