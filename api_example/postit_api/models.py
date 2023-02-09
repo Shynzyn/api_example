@@ -8,9 +8,11 @@ class Post(models.Model):
     body = models.CharField(max_length=2000)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to="pictures", null=True)
 
     class Meta:
         ordering = ["-created"]
+
 
 
 class Comment(models.Model):
